@@ -11,10 +11,14 @@
     <div class="container">
         <!--Formulario -->
         <div id="formulario">
-            <h1>🔧 Sistema de Mantenimiento Preventivo</h1>
-            <p class="subtitle">Evaluación de riesgo mecánico basado en señales tempranas</p>
-            
+            <h1>🔧 Sistema de Mantenimiento Preventivo 🔧</h1>
+            <p class="subtitle">Evaluación de riesgo mecánico basado en señales tempranas - Grupo TRAXION</p>
             <form id="formMantenimiento">
+                <div class="form-group">
+                    <label for="Idvehiculo">Matricula del Vehiculo:</label>
+                    <input type="text" id="Idvehiculo" required min="0" placeholder="Ej: M3V56G">
+                </div>
+                                
                 <div class="form-group">
                     <label for="kmActuales">Kilómetros actuales:</label>
                     <input type="number" id="kmActuales" required min="0" placeholder="Ej: 45000">
@@ -40,7 +44,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>¿Conducción agresiva detectada?</label>
+                    <label>¿Conducción a exceso de velocidad?</label>
                     <div class="radio-group">
                         <div class="radio-option">
                             <input type="radio" id="conduccionSi" name="conduccion" value="si" required>
@@ -51,6 +55,25 @@
                             <label for="conduccionNo">No</label>
                         </div>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Frenadas bruscas frecuentes?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="FrenadasSi" name="conduccion" value="si" required>
+                            <label for="conduccionSi">Sí</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="FrenadasNo" name="conduccion" value="no">
+                            <label for="conduccionNo">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="hServicio">Horas de operación diarias:</label>
+                    <input type="number" id="hServicio" required min="0" placeholder="Ej: 8">
                 </div>
 
                 <div class="form-group">
@@ -83,7 +106,7 @@
             </div>
 
             <div class="accion">
-                <h3>🎯 Acción recomendada:</h3>
+                <h3>🎯 Acciónes recomendada:</h3>
                 <p id="accionTexto"></p>
             </div>
 
@@ -102,7 +125,8 @@
             const kmActuales = parseInt(document.getElementById('kmActuales').value);
             const kmUltimoServicio = parseInt(document.getElementById('kmUltimoServicio').value);
             const tieneFallas = document.querySelector('input[name="fallas"]:checked').value;
-            const conduccionAgresiva = document.querySelector('input[name="conduccion"]:checked').value;
+            const excesoDeVelocidad = document.querySelector('input[name="Velocidad"]:checked').value;
+            const FrenadasBruscas = document.querySelector('input[name="Frenadas"]:checked').value;
             const tipoOperacion = document.getElementById('tipoOperacion').value;
 
             let puntuacion = 0;
