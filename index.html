@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Sistema de Mantenimiento Preventivo</title>
+    
+</head>
+<body>
+    <div class="container">
+        <!--Formulario -->
+        <div id="formulario">
+            <h1>🔧 Sistema de Mantenimiento Preventivo</h1>
+            <p class="subtitle">Evaluación de riesgo mecánico basado en señales tempranas</p>
+            
+            <form id="formMantenimiento">
+                <div class="form-group">
+                    <label for="kmActuales">Kilómetros actuales:</label>
+                    <input type="number" id="kmActuales" required min="0" placeholder="Ej: 45000">
+                </div>
+
+                <div class="form-group">
+                    <label for="kmUltimoServicio">Kilómetros del último servicio:</label>
+                    <input type="number" id="kmUltimoServicio" required min="0" placeholder="Ej: 40000">
+                </div>
+
+                <div class="form-group">
+                    <label>¿Presenta códigos de falla?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="fallasSi" name="fallas" value="si" required>
+                            <label for="fallasSi">Sí</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="fallasNo" name="fallas" value="no">
+                            <label for="fallasNo">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Conducción agresiva detectada?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="conduccionSi" name="conduccion" value="si" required>
+                            <label for="conduccionSi">Sí</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="conduccionNo" name="conduccion" value="no">
+                            <label for="conduccionNo">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoOperacion">Tipo de operación:</label>
+                    <select id="tipoOperacion" required>
+                        <option value="">Seleccione...</option>
+                        <option value="urbana">Urbana (ciudad)</option>
+                        <option value="carretera">Carretera</option>
+                        <option value="mixta">Mixta</option>
+                        <option value="severa">Severa (carga pesada/terreno difícil)</option>
+                    </select>
+                </div>
+
+                <button type="submit">Evaluar Riesgo</button>
+            </form>
+        </div>
+
+        <!-- Pantalla 2: Resultado -->
+        <div id="resultado" class="hidden resultado">
+            <h1>📊 Resultado de Evaluación</h1>
+            
+            <div class="semaforo" id="semaforo">🟢</div>
+            
+            <div class="riesgo-nivel" id="nivelRiesgo">Riesgo: BAJO</div>
+            
+            <div class="explicacion">
+                <h3>Análisis de factores:</h3>
+                <ul id="listaFactores"></ul>
+                <p style="margin-top: 15px; font-weight: bold;" id="puntuacionTotal"></p>
+            </div>
+
+            <div class="accion">
+                <h3>🎯 Acción recomendada:</h3>
+                <p id="accionTexto"></p>
+            </div>
+
+            <button class="btn-volver" onclick="volverFormulario()">← Nueva Evaluación</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('formMantenimiento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calcularRiesgo();
+        });
+
+        function calcularRiesgo() {
+            // Obtener valores
+            const kmActuales = parseInt(document.getElementById('kmActuales').value);
+            const kmUltimoServicio = parseInt(document.getElementById('kmUltimoServicio').value);
+            const tieneFallas = document.querySelector('input[name="fallas"]:checked').value;
+            const conduccionAgresiva = document.querySelector('input[name="conduccion"]:checked').value;
+            const tipoOperacion = document.getElementById('tipoOperacion').value;
+
+            let puntuacion = 0;
+            let factores = [];
+
+            // Factor 1: Kilómetros desde último servicio
+            const kmDesdeServicio = kmActuales - kmUltimoServicio;
+            if (kmDesdeServicio > 10000) {
+                puntuacion += 30;
+                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km (+30 puntos) - Excede intervalo recomendado`);
+            } else if (kmDesdeServicio > 5000) {
+                puntuacion += 15;
+                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km (+15 puntos) - Próximo a mantenimiento`);
+            } else {
+                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km (0 puntos) - Dentro del rango`);
+            }
+
+            // Factor 2: Códigos de falla
+            if (tieneFallas === 'si') {
+                puntuacion += 35;
+                factores.push('Códigos de falla detectados (+35 puntos) - Requiere diagnóstico');
+            } else {
+                factores.push('Sin códigos de falla (0 puntos)');
+            }
+
+            // Factor 3: Conducción agresiva
+            if (conduccionAgresiva === 'si') {
+                puntuacion += 20;
+                factores.push('Conducción agresiva detectada (+20 puntos) - Acelera desgaste');
+            } else {
+                factores.push('Conducción normal (0 puntos)');
+            }
+
+            // Factor 4: Tipo de operación
+            switch(tipoOperacion) {
+                case 'severa':
+                    puntuacion += 25;
+                    factores.push('Operación severa (+25 puntos) - Alto desgaste de componentes');
+                    break;
+                case 'mixta':
+                    puntuacion += 15;
+                    factores.push('Operación mixta (+15 puntos) - Desgaste moderado');
+                    break;
+                case 'urbana':
+                    puntuacion += 10;
+                    factores.push('Operación urbana (+10 puntos) - Desgaste por arranques frecuentes');
+                    break;
+                case 'carretera':
+                    puntuacion += 5;
+                    factores.push('Operación en carretera (+5 puntos) - Desgaste uniforme');
+                    break;
+            }
+
+            // Determinar nivel de riesgo
+            let nivel, semaforo, accion;
+            
+            if (puntuacion >= 60) {
+                nivel = 'ALTO';
+                semaforo = '🔴';
+                accion = 'INTERVENIR INMEDIATAMENTE: Programar inspección técnica urgente. La unidad presenta múltiples señales de riesgo que podrían derivar en falla mecánica. Detener operación si es posible hasta revisión.';
+            } else if (puntuacion >= 30) {
+                nivel = 'MEDIO';
+                semaforo = '🟡';
+                accion = 'REVISAR PRÓXIMAMENTE: Agendar inspección preventiva en los próximos 7 días. Monitorear señales de alerta y ajustar plan de mantenimiento según hallazgos.';
+            } else {
+                nivel = 'BAJO';
+                semaforo = '🟢';
+                accion = 'MANTENER MONITOREO: La unidad está en condiciones normales. Continuar con plan de mantenimiento programado. Realizar próxima revisión según calendario establecido.';
+            }
+
+            // Mostrar resultado
+            document.getElementById('semaforo').textContent = semaforo;
+            document.getElementById('nivelRiesgo').textContent = `Riesgo: ${nivel}`;
+            document.getElementById('nivelRiesgo').className = `riesgo-nivel riesgo-${nivel.toLowerCase()}`;
+            document.getElementById('puntuacionTotal').textContent = `Puntuación total de riesgo: ${puntuacion} / 110 puntos`;
+            document.getElementById('accionTexto').textContent = accion;
+
+            // Mostrar factores
+            const listaFactores = document.getElementById('listaFactores');
+            listaFactores.innerHTML = '';
+            factores.forEach(factor => {
+                const li = document.createElement('li');
+                li.textContent = factor;
+                listaFactores.appendChild(li);
+            });
+
+            // Cambiar pantalla
+            document.getElementById('formulario').classList.add('hidden');
+            document.getElementById('resultado').classList.remove('hidden');
+        }
+
+        function volverFormulario() {
+            document.getElementById('resultado').classList.add('hidden');
+            document.getElementById('formulario').classList.remove('hidden');
+            document.getElementById('formMantenimiento').reset();
+        }
+    </script>
+</body>
+</html>
