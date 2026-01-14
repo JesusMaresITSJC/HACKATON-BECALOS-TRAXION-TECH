@@ -1,5 +1,4 @@
-
-        * {
+* {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -183,4 +182,13 @@
 
         .btn-volver:hover {
             background: #4b5563;
+        }
+
+        .btn-descargar {
+            background: #059669;
+            margin-top: 20px;
+        }
+
+        .btn-descargar:hover {
+            background: #047857;
         }
