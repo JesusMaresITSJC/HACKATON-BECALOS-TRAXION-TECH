@@ -9,14 +9,15 @@
 </head>
 <body>
     <div class="container">
-        <!--Formulario -->
+        <!-- Formulario -->
         <div id="formulario">
             <h1>🔧 Sistema de Mantenimiento Preventivo 🔧</h1>
             <p class="subtitle">Evaluación de riesgo mecánico basado en señales tempranas - Grupo TRAXION</p>
+            
             <form id="formMantenimiento">
                 <div class="form-group">
-                    <label for="Idvehiculo">Matricula del Vehiculo:</label>
-                    <input type="text" id="Idvehiculo" required min="0" placeholder="Ej: M3V56G">
+                    <label for="Idvehiculo">Matrícula del Vehículo:</label>
+                    <input type="text" id="Idvehiculo" required placeholder="Ej: M3V56G">
                 </div>
                                 
                 <div class="form-group">
@@ -47,12 +48,12 @@
                     <label>¿Conducción a exceso de velocidad?</label>
                     <div class="radio-group">
                         <div class="radio-option">
-                            <input type="radio" id="conduccionSi" name="conduccion" value="si" required>
-                            <label for="conduccionSi">Sí</label>
+                            <input type="radio" id="velocidadSi" name="velocidad" value="si" required>
+                            <label for="velocidadSi">Sí</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="conduccionNo" name="conduccion" value="no">
-                            <label for="conduccionNo">No</label>
+                            <input type="radio" id="velocidadNo" name="velocidad" value="no">
+                            <label for="velocidadNo">No</label>
                         </div>
                     </div>
                 </div>
@@ -61,19 +62,19 @@
                     <label>¿Frenadas bruscas frecuentes?</label>
                     <div class="radio-group">
                         <div class="radio-option">
-                            <input type="radio" id="FrenadasSi" name="conduccion" value="si" required>
-                            <label for="conduccionSi">Sí</label>
+                            <input type="radio" id="frenadasSi" name="frenadas" value="si" required>
+                            <label for="frenadasSi">Sí</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="FrenadasNo" name="conduccion" value="no">
-                            <label for="conduccionNo">No</label>
+                            <input type="radio" id="frenadasNo" name="frenadas" value="no">
+                            <label for="frenadasNo">No</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="hServicio">Horas de operación diarias:</label>
-                    <input type="number" id="hServicio" required min="0" placeholder="Ej: 8">
+                    <input type="number" id="hServicio" required min="0" max="24" placeholder="Ej: 8">
                 </div>
 
                 <div class="form-group">
@@ -94,6 +95,7 @@
         <!-- Pantalla 2: Resultado -->
         <div id="resultado" class="hidden resultado">
             <h1>📊 Resultado de Evaluación</h1>
+            <p class="subtitle">Vehículo: <span id="mostrarMatricula"></span></p>
             
             <div class="semaforo" id="semaforo">🟢</div>
             
@@ -106,7 +108,7 @@
             </div>
 
             <div class="accion">
-                <h3>🎯 Acciónes recomendada:</h3>
+                <h3>🎯 Acciones recomendadas:</h3>
                 <p id="accionTexto"></p>
             </div>
 
@@ -122,11 +124,13 @@
 
         function calcularRiesgo() {
             // Obtener valores
+            const matricula = document.getElementById('Idvehiculo').value;
             const kmActuales = parseInt(document.getElementById('kmActuales').value);
             const kmUltimoServicio = parseInt(document.getElementById('kmUltimoServicio').value);
             const tieneFallas = document.querySelector('input[name="fallas"]:checked').value;
-            const excesoDeVelocidad = document.querySelector('input[name="Velocidad"]:checked').value;
-            const FrenadasBruscas = document.querySelector('input[name="Frenadas"]:checked').value;
+            const excesoDeVelocidad = document.querySelector('input[name="velocidad"]:checked').value;
+            const frenadasBruscas = document.querySelector('input[name="frenadas"]:checked').value;
+            const hServicio = parseInt(document.getElementById('hServicio').value);
             const tipoOperacion = document.getElementById('tipoOperacion').value;
 
             let puntuacion = 0;
@@ -136,72 +140,89 @@
             const kmDesdeServicio = kmActuales - kmUltimoServicio;
             if (kmDesdeServicio > 10000) {
                 puntuacion += 30;
-                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km (+30 puntos) - Excede intervalo recomendado`);
+                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km - Excede intervalo recomendado`);
             } else if (kmDesdeServicio > 5000) {
                 puntuacion += 15;
-                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km (+15 puntos) - Próximo a mantenimiento`);
+                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km - Próximo a mantenimiento`);
             } else {
-                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km (0 puntos) - Dentro del rango`);
+                factores.push(`Km desde último servicio: ${kmDesdeServicio.toLocaleString()} km - Dentro del rango`);
             }
 
             // Factor 2: Códigos de falla
             if (tieneFallas === 'si') {
                 puntuacion += 35;
-                factores.push('Códigos de falla detectados (+35 puntos) - Requiere diagnóstico');
+                factores.push('Códigos de falla detectados - Requiere diagnóstico');
             } else {
-                factores.push('Sin códigos de falla (0 puntos)');
+                factores.push('Sin códigos de falla');
             }
 
-            // Factor 3: Conducción agresiva
-            if (conduccionAgresiva === 'si') {
+            // Factor 3: Conducción a exceso de velocidad
+            if (excesoDeVelocidad === 'si') {
                 puntuacion += 20;
-                factores.push('Conducción agresiva detectada (+20 puntos) - Acelera desgaste');
+                factores.push('Conducción a exceso de velocidad - Acelera desgaste');
             } else {
-                factores.push('Conducción normal (0 puntos)');
+                factores.push('Velocidad de conducción normal');
             }
 
-            // Factor 4: Tipo de operación
+            // Factor 4: Frenadas bruscas
+            if (frenadasBruscas === 'si') {
+                puntuacion += 20;
+                factores.push('Frenadas bruscas frecuentes - Acelera desgaste en frenos');
+            } else {
+                factores.push('Frenado normal');
+            }
+
+            // Factor 5: Horas activas de servicio
+            if (hServicio > 8) {
+                puntuacion += 30;
+                factores.push(`Horas activas: ${hServicio} hrs/día - Excede intervalo recomendado`);
+            } else {
+                factores.push(`Horas activas: ${hServicio} hrs/día - Dentro del rango`);
+            }
+
+            // Factor 6: Tipo de operación
             switch(tipoOperacion) {
                 case 'severa':
                     puntuacion += 25;
-                    factores.push('Operación severa (+25 puntos) - Alto desgaste de componentes');
+                    factores.push('Operación severa - Alto desgaste de componentes');
                     break;
                 case 'mixta':
                     puntuacion += 15;
-                    factores.push('Operación mixta (+15 puntos) - Desgaste moderado');
+                    factores.push('Operación mixta - Desgaste moderado');
                     break;
                 case 'urbana':
                     puntuacion += 10;
-                    factores.push('Operación urbana (+10 puntos) - Desgaste por arranques frecuentes');
+                    factores.push('Operación urbana - Desgaste por arranques frecuentes');
                     break;
                 case 'carretera':
                     puntuacion += 5;
-                    factores.push('Operación en carretera (+5 puntos) - Desgaste uniforme');
+                    factores.push('Operación en carretera - Desgaste uniforme');
                     break;
             }
 
             // Determinar nivel de riesgo
             let nivel, semaforo, accion;
             
-            if (puntuacion >= 60) {
+            if (puntuacion >= 100) {
                 nivel = 'ALTO';
                 semaforo = '🔴';
                 accion = 'INTERVENIR INMEDIATAMENTE: Programar inspección técnica urgente. La unidad presenta múltiples señales de riesgo que podrían derivar en falla mecánica. Detener operación si es posible hasta revisión.';
-            } else if (puntuacion >= 30) {
+            } else if (puntuacion >= 50) {
                 nivel = 'MEDIO';
                 semaforo = '🟡';
                 accion = 'REVISAR PRÓXIMAMENTE: Agendar inspección preventiva en los próximos 7 días. Monitorear señales de alerta y ajustar plan de mantenimiento según hallazgos.';
             } else {
                 nivel = 'BAJO';
                 semaforo = '🟢';
-                accion = 'MANTENER MONITOREO: La unidad está en condiciones normales. Continuar con plan de mantenimiento programado. Realizar próxima revisión según calendario establecido.';
+                accion = 'MANTENER MONITOREO: La unidad está en condiciones normales. Continuar con plan de mantenimiento programado. Realizar próxima revisión según calendario establecido. Puedes revisar otros aspectos de la unidad para su buen funcionamiento como: Aire de los neumaticos, nivel de aceite, nivel de liquido de frenos, etc.';
             }
 
             // Mostrar resultado
+            document.getElementById('mostrarMatricula').textContent = matricula.toUpperCase();
             document.getElementById('semaforo').textContent = semaforo;
             document.getElementById('nivelRiesgo').textContent = `Riesgo: ${nivel}`;
             document.getElementById('nivelRiesgo').className = `riesgo-nivel riesgo-${nivel.toLowerCase()}`;
-            document.getElementById('puntuacionTotal').textContent = `Puntuación total de riesgo: ${puntuacion} / 110 puntos`;
+            document.getElementById('puntuacionTotal').textContent = `Puntuación total de riesgo: ${puntuacion} / 170 puntos`;
             document.getElementById('accionTexto').textContent = accion;
 
             // Mostrar factores
