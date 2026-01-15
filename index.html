@@ -8,6 +8,7 @@
     
 </head>
 <body>
+
     <div class="container">
         <!-- Formulario -->
         <div id="formulario">
@@ -245,5 +246,58 @@
             document.getElementById('formMantenimiento').reset();
         }
     </script>
+
+    <!-- ===============================
+     ASISTENTE IA TRAxIBOT
+=============================== -->
+
+<input type="checkbox" id="chat-toggle">
+
+<label for="chat-toggle" class="chat-btn" title="Asistente de Mantenimiento">
+    🚛
+</label>
+
+<div class="chat-box">
+    <div class="chat-header">
+        TraxiBot 🤖🚛
+    </div>
+
+    <div class="chat-body">
+        <div class="bot-msg">
+            ¡Hola! Soy <strong>TraxiBot</strong>, el asistente del sistema de mantenimiento preventivo.
+        </div>
+
+        <div class="bot-msg">
+            Mi función es ayudarte a entender cuándo y por qué una unidad requiere mantenimiento.
+        </div>
+
+        <div class="options">
+            <input type="radio" name="chatbot" id="opt1">
+            <label for="opt1">¿Por qué es importante el mantenimiento?</label>
+
+            <input type="radio" name="chatbot" id="opt2">
+            <label for="opt2">¿Qué analiza este sistema?</label>
+
+            <input type="radio" name="chatbot" id="opt3">
+            <label for="opt3">¿Qué beneficios tiene para TRAXION?</label>
+
+            <div class="response resp1 bot-msg">
+                El mantenimiento preventivo evita fallas mecánicas, reduce accidentes,
+                prolonga la vida útil del vehículo y disminuye costos operativos.
+            </div>
+
+            <div class="response resp2 bot-msg">
+                Analiza kilómetros recorridos, hábitos de conducción,
+                horas de operación, tipo de servicio y señales de desgaste mecánico.
+            </div>
+
+            <div class="response resp3 bot-msg">
+                Permite tomar decisiones oportunas, reducir paros inesperados,
+                optimizar recursos y garantizar una flota más segura y eficiente.
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
-</html>
+</html> 
